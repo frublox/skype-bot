@@ -12,8 +12,25 @@ import Data.Aeson
 import Data.Aeson.TH
 import Data.String (IsString)
 
+import Misc (modifyIndex)
+
 newtype Id = Id Text
     deriving (Show, IsString, FromJSON, ToJSON)
+
+data ContactAction = ContactAdd | ContactRemove
+    deriving (Show)
+
+instance FromJSON ContactAction where
+    parseJSON (String str) =
+        case str of
+            "add" -> return ContactAdd
+            "remove" -> return ContactRemove
+
+    parseJSON invalid = typeMismatch "ContactAction" invalid
+
+instance ToJSON ContactAction where
+    toJSON ContactAdd = String "add"
+    toJSON ContactRemove = String "Remove"
 
 data Address = Address
     { _adId      :: Id
@@ -23,7 +40,7 @@ data Address = Address
 makeLenses ''Address
 
 $(deriveJSON defaultOptions
-    { fieldLabelModifier = (\(c:cs) -> toLower c : cs) . drop 3
+    { fieldLabelModifier = modifyIndex 0 toLower . drop 3
     , omitNothingFields = True
     } ''Address)
 
@@ -59,7 +76,7 @@ data Payload = Payload
     , _plEntities         :: [Object]
 
     -- Contact Relation Update
-    , _plAction           :: Maybe Text    -- "add" or "remove"
+    , _plContactAction    :: Maybe ContactAction
 
     -- Conversation Update
     , _plConversation     :: Maybe Address

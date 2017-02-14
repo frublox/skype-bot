@@ -25,6 +25,9 @@ library
                      , wreq
                      , bytestring
                      , text
+                     , servant-server
+                     , wai
+                     , warp
   default-language:    Haskell2010
 
 executable skype-bot-exe

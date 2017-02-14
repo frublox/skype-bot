@@ -10,8 +10,11 @@ module Skype
     , ClientCreds(..)
     , Skype
     , runSkype
+    , withAuth
     )
 where
+
+import Skype.Types
 
 import Data.Aeson
 import Data.Aeson.Lens
@@ -47,7 +50,7 @@ newtype Skype a = Skype { unSkype :: HasCreds (HasAuth IO) a }
     deriving (Functor, Applicative, Monad, MonadIO, 
         MonadReader ClientCreds, MonadState AuthState)
 
-runSkype :: Skype a -> ClientCreds -> IO (Maybe a)
+runSkype :: MonadIO io => Skype a -> ClientCreds -> io (Maybe a)
 runSkype skype creds = do
     authState <- authenticate creds
 
@@ -56,7 +59,7 @@ runSkype skype creds = do
         Just authState' -> do
             let unwrappedCreds = runReaderT (unSkype skype) creds
             unwrappedState <- evalStateT unwrappedCreds authState'
-            return (Just unwrappedState)
+            return $ liftIO (Just unwrappedState)
 
 authenticate :: ClientCreds -> IO (Maybe AuthState)
 authenticate creds = do
@@ -81,7 +84,7 @@ authenticate creds = do
         
         scope :: BL.ByteString
         scope = "https://api.botframework.com/.default"
-        
+
         params cliId cliSecret = 
             [ "grant_type" := ("client_credentials" :: BL.ByteString)
             , "client_id" := cliId
@@ -120,6 +123,5 @@ withAuth f = do
                 Nothing -> return Nothing
                 Just newAuthState -> do
                     put newAuthState
-                    token' <- use authToken
-                    return $ Just (f token')
+                    withAuth f
         False -> return $ Just (f token)
