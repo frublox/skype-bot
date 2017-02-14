@@ -3,8 +3,8 @@ version:             0.1.0.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/githubuser/skype-bot#readme
-license:             BSD3
-license-file:        LICENSE
+-- license:             BSD3
+-- license-file:        LICENSE
 author:              Author name here
 maintainer:          example@example.com
 copyright:           2017 Author name here
@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Skype
   build-depends:       base >= 4.7 && < 5
                      , lens
                      , aeson
@@ -24,6 +24,7 @@ library
                      , lens-aeson
                      , wreq
                      , bytestring
+                     , text
   default-language:    Haskell2010
 
 executable skype-bot-exe

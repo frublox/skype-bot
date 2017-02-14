@@ -3,16 +3,14 @@
 
 module Skype.Types where
 
-import           Control.Lens
+import Control.Lens
 
-import           Data.Char     (toLower)
-import           Data.Text     (Text)
+import Data.Char (toLower)
+import Data.Text (Text)
 
-import           Data.Aeson
-import           Data.Aeson.TH
+import Data.Aeson
+import Data.Aeson.TH
 import Data.String (IsString)
-
-import           Misc          (modifyIndex)
 
 newtype Id = Id Text
     deriving (Show, IsString, FromJSON, ToJSON)
